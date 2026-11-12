@@ -106,7 +106,64 @@ function initSchema() {
       contactPhone TEXT NOT NULL,
       updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS customers (
+      id TEXT PRIMARY KEY,
+      fullName TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      passwordHash TEXT NOT NULL,
+      age INTEGER,
+      gender TEXT,
+      bloodGroup TEXT,
+      contactPhone TEXT,
+      city TEXT,
+      role TEXT NOT NULL DEFAULT 'donor',
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS donation_camps (
+      id TEXT PRIMARY KEY,
+      campName TEXT NOT NULL,
+      organizer TEXT NOT NULL,
+      venue TEXT NOT NULL,
+      city TEXT NOT NULL,
+      campDate TEXT NOT NULL,
+      campTime TEXT NOT NULL,
+      contactPhone TEXT,
+      targetUnits INTEGER DEFAULT 100,
+      registeredCount INTEGER DEFAULT 0,
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS donor_appointments (
+      id TEXT PRIMARY KEY,
+      userId TEXT,
+      donorName TEXT NOT NULL,
+      contactPhone TEXT NOT NULL,
+      email TEXT,
+      bloodGroup TEXT,
+      campId TEXT,
+      campName TEXT,
+      appointmentDate TEXT NOT NULL,
+      preferredSlot TEXT,
+      status TEXT DEFAULT 'Confirmed',
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP
+    );
   `);
+
+  // Gracefully ensure requests table has userId and requesterEmail columns
+  try {
+    db.exec(`ALTER TABLE requests ADD COLUMN userId TEXT;`);
+  } catch (e) {
+    // Column already exists, safe to ignore
+  }
+  try {
+    db.exec(`ALTER TABLE requests ADD COLUMN requesterEmail TEXT;`);
+  } catch (e) {
+    // Column already exists, safe to ignore
+  }
 }
 
 /**
@@ -115,6 +172,8 @@ function initSchema() {
 function seedDatabase(force = false) {
   const countRow = db.prepare('SELECT COUNT(*) as count FROM inventory').get();
   const userCountRow = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  const customerCountRow = db.prepare('SELECT COUNT(*) as count FROM customers').get();
+  const campCountRow = db.prepare('SELECT COUNT(*) as count FROM donation_camps').get();
   
   if (force) {
     db.exec(`
@@ -124,6 +183,9 @@ function seedDatabase(force = false) {
       DELETE FROM donations;
       DELETE FROM settings;
       DELETE FROM users;
+      DELETE FROM customers;
+      DELETE FROM donation_camps;
+      DELETE FROM donor_appointments;
     `);
   }
 
@@ -148,11 +210,56 @@ function seedDatabase(force = false) {
     );
   }
 
+  const { settings, inventory, donors, requests, donations, customerUser, camps } = getInitialData();
+
+  // Seed default demo citizen/donor user if customers table is empty
+  if (customerCountRow.count === 0 || force) {
+    const customerPasswordHash = bcrypt.hashSync('SecurePassword123', 10);
+    const insertCustomer = db.prepare(`
+      INSERT OR REPLACE INTO customers
+      (id, fullName, email, passwordHash, age, gender, bloodGroup, contactPhone, city, role, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    `);
+    insertCustomer.run(
+      customerUser.id,
+      customerUser.fullName,
+      customerUser.email.toLowerCase(),
+      customerPasswordHash,
+      customerUser.age,
+      customerUser.gender,
+      customerUser.bloodGroup,
+      customerUser.contactPhone,
+      customerUser.city,
+      customerUser.role
+    );
+  }
+
+  // Seed donation camps if table is empty
+  if (campCountRow.count === 0 || force) {
+    const insertCamp = db.prepare(`
+      INSERT OR REPLACE INTO donation_camps
+      (id, campName, organizer, venue, city, campDate, campTime, contactPhone, targetUnits, registeredCount, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    `);
+    for (const c of (camps || [])) {
+      insertCamp.run(
+        c.id,
+        c.campName,
+        c.organizer,
+        c.venue,
+        c.city,
+        c.campDate,
+        c.campTime,
+        c.contactPhone,
+        c.targetUnits || 100,
+        c.registeredCount || 0
+      );
+    }
+  }
+
   if (countRow && countRow.count > 0 && !force) {
     return; // Already seeded
   }
-
-  const { settings, inventory, donors, requests, donations } = getInitialData();
 
   // Settings
   const insertSettings = db.prepare(`
@@ -192,11 +299,22 @@ function seedDatabase(force = false) {
   // Requests
   const insertRequest = db.prepare(`
     INSERT OR REPLACE INTO requests 
-    (id, patientName, hospitalName, bloodGroup, units, contactPhone, requestDate, status, createdAt, updatedAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    (id, patientName, hospitalName, bloodGroup, units, contactPhone, requestDate, status, userId, requesterEmail, createdAt, updatedAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
   `);
   for (const r of requests) {
-    insertRequest.run(r.id, r.patientName, r.hospitalName, r.bloodGroup, r.units, r.contactPhone, r.requestDate, r.status);
+    insertRequest.run(
+      r.id,
+      r.patientName,
+      r.hospitalName,
+      r.bloodGroup,
+      r.units,
+      r.contactPhone,
+      r.requestDate,
+      r.status,
+      r.id === 'REQ-502' ? 'CST-201' : null,
+      r.id === 'REQ-502' ? 'donor@eraktkosh.in' : null
+    );
   }
 
   // Donations
@@ -213,6 +331,7 @@ function seedDatabase(force = false) {
 // Initialize tables and seed on module load
 initSchema();
 seedDatabase();
+
 
 module.exports = {
   db,

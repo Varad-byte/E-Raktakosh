@@ -9,7 +9,12 @@ const donationRoutes = require('./donation.routes');
 const settingsRoutes = require('./settings.routes');
 const systemRoutes = require('./system.routes');
 
+const publicRoutes = require('./public.routes');
+const customerRoutes = require('./customer.routes');
+
 router.use('/auth', authRoutes);
+router.use('/public', publicRoutes);
+router.use('/customer', customerRoutes);
 router.use('/inventory', inventoryRoutes);
 router.use('/donors', donorRoutes);
 router.use('/requests', requestRoutes);

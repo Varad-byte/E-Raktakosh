@@ -26,7 +26,17 @@
           <i class="fa-solid fa-droplet"></i>
         </div>
         <h2 class="auth-title">BBIMS Portal</h2>
-        <p class="auth-subtitle">National Blood Inventory & Transfusion Registry (e-RaktKosh)</p>
+        <p class="auth-subtitle" id="authSubtitle">e-RaktKosh Citizen & Voluntary Donor Portal</p>
+      </div>
+
+      <!-- Role Selector Toggle -->
+      <div class="auth-role-tabs">
+        <button type="button" class="auth-role-tab active" id="roleTabDonor" onclick="switchAuthRole('donor')">
+          <i class="fa-solid fa-user-circle"></i> Citizen / Donor
+        </button>
+        <button type="button" class="auth-role-tab" id="roleTabAdmin" onclick="switchAuthRole('admin')">
+          <i class="fa-solid fa-hospital-user"></i> Blood Bank Admin
+        </button>
       </div>
 
       <!-- Segmented Navigation Tabs -->
@@ -35,7 +45,7 @@
           <i class="fa-solid fa-right-to-bracket"></i> Sign In
         </button>
         <button type="button" class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">
-          <i class="fa-solid fa-building-circle-check"></i> Register Blood Bank
+          <i class="fa-solid fa-user-plus"></i> Register as Donor
         </button>
       </div>
 
@@ -45,10 +55,10 @@
       <!-- LOGIN FORM -->
       <form id="authLoginForm" autocomplete="on">
         <div class="form-group mb-3">
-          <label class="form-label" for="loginEmail">Officer Email Address <span class="text-danger">*</span></label>
+          <label class="form-label" for="loginEmail" id="loginEmailLabel">Citizen Email Address <span class="text-danger">*</span></label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-envelope input-icon"></i>
-            <input type="email" id="loginEmail" class="form-control" placeholder="admin@bloodbank.org" required autocomplete="email">
+            <input type="email" id="loginEmail" class="form-control" placeholder="donor@eraktkosh.in" required autocomplete="email">
           </div>
         </div>
 
@@ -61,64 +71,126 @@
         </div>
 
         <button type="submit" class="btn btn-primary w-100" id="btnLoginSubmit">
-          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Citizen Portal
         </button>
 
         <p class="auth-toggle-link">
-          Need a facility account? <a onclick="switchAuthTab('register')">Register New Blood Bank</a>
+          Need an account? <a onclick="switchAuthTab('register')">Create New Account</a>
         </p>
 
         <!-- 1-Click Demo Credentials Hint -->
         <div class="auth-demo-hint">
           <div class="auth-demo-text">
-            <strong>Default Demo Account:</strong><br>
-            <code>admin@bloodbank.org</code> / <code>SecurePassword123</code>
+            <strong id="demoRoleLabel">Demo Citizen Donor:</strong><br>
+            <code id="demoHintEmail">donor@eraktkosh.in</code> / <code>SecurePassword123</code>
           </div>
           <button type="button" class="btn-demo-fill" onclick="fillDemoCredentials()">Auto Fill</button>
+        </div>
+
+        <div class="auth-guest-link">
+          <a onclick="openPublicPortal()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Explore Blood Stock &amp; Camps as Guest</a>
         </div>
       </form>
 
       <!-- REGISTRATION FORM -->
       <form id="authRegisterForm" style="display: none;" autocomplete="on">
-        <div class="auth-form-grid">
+        <!-- Citizen / Donor Registration Fields -->
+        <div class="auth-form-grid" id="donorRegisterFields">
+          <div class="form-group full-col">
+            <label class="form-label" for="regDonorFullName">Full Name <span class="text-danger">*</span></label>
+            <input type="text" id="regDonorFullName" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regDonorBloodGroup">Blood Group <span class="text-danger">*</span></label>
+            <select id="regDonorBloodGroup" class="form-control" required>
+              <option value="">Select Group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regDonorAge">Age (Years) <span class="text-danger">*</span></label>
+            <input type="number" id="regDonorAge" class="form-control" placeholder="e.g. 28" min="18" max="65" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regDonorGender">Gender <span class="text-danger">*</span></label>
+            <select id="regDonorGender" class="form-control" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regDonorCity">City / Location <span class="text-danger">*</span></label>
+            <input type="text" id="regDonorCity" class="form-control" placeholder="e.g. New Delhi" required>
+          </div>
+
+          <div class="form-group full-col">
+            <label class="form-label" for="regDonorPhone">Contact Phone <span class="text-danger">*</span></label>
+            <input type="tel" id="regDonorPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+          </div>
+
+          <div class="form-group full-col">
+            <label class="form-label" for="regDonorEmail">Email Address <span class="text-danger">*</span></label>
+            <input type="email" id="regDonorEmail" class="form-control" placeholder="donor@eraktkosh.in" required>
+          </div>
+
+          <div class="form-group full-col">
+            <label class="form-label" for="regDonorPassword">Create Password <span class="text-danger">*</span></label>
+            <input type="password" id="regDonorPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+        </div>
+
+        <!-- Admin Facility Registration Fields -->
+        <div class="auth-form-grid" id="adminRegisterFields" style="display: none;">
           <div class="form-group full-col">
             <label class="form-label" for="regFacilityName">Blood Bank / Facility Name <span class="text-danger">*</span></label>
-            <input type="text" id="regFacilityName" class="form-control" placeholder="e.g., District Central Blood Bank" required>
+            <input type="text" id="regFacilityName" class="form-control" placeholder="e.g. District Central Blood Bank">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="regLicenseNumber">License Number <span class="text-danger">*</span></label>
-            <input type="text" id="regLicenseNumber" class="form-control" placeholder="e.g., DL-BB-2024-0981" required>
+            <input type="text" id="regLicenseNumber" class="form-control" placeholder="e.g. DL-BB-2024-0981">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="regCity">City / Location <span class="text-danger">*</span></label>
-            <input type="text" id="regCity" class="form-control" placeholder="e.g., New Delhi" required>
+            <input type="text" id="regCity" class="form-control" placeholder="e.g. New Delhi">
           </div>
 
           <div class="form-group full-col">
             <label class="form-label" for="regNodalOfficer">Nodal Blood Officer Name <span class="text-danger">*</span></label>
-            <input type="text" id="regNodalOfficer" class="form-control" placeholder="e.g., Dr. Amit Roy" required>
+            <input type="text" id="regNodalOfficer" class="form-control" placeholder="e.g. Dr. Amit Roy">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="regContactPhone">Contact Phone <span class="text-danger">*</span></label>
-            <input type="tel" id="regContactPhone" class="form-control" placeholder="e.g., +91 98765 43210" required>
+            <input type="tel" id="regContactPhone" class="form-control" placeholder="e.g. +91 98765 43210">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="regEmail">Officer Email <span class="text-danger">*</span></label>
-            <input type="email" id="regEmail" class="form-control" placeholder="admin@bloodbank.org" required>
+            <input type="email" id="regEmail" class="form-control" placeholder="admin@bloodbank.org">
           </div>
 
           <div class="form-group full-col">
             <label class="form-label" for="regPassword">Create Password <span class="text-danger">*</span></label>
-            <input type="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+            <input type="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6">
           </div>
         </div>
 
         <button type="submit" class="btn btn-primary w-100 mt-4" id="btnRegisterSubmit">
-          <i class="fa-solid fa-building-circle-check"></i> Register & Access Portal
+          <i class="fa-solid fa-circle-check"></i> Register &amp; Access Portal
         </button>
 
         <p class="auth-toggle-link">
@@ -126,6 +198,420 @@
         </p>
       </form>
     </div>
+  </div>
+
+  <!-- CUSTOMER & PUBLIC PORTAL VIEW -->
+  <div class="customer-layout" id="customerPortalContainer" style="display: none;">
+    
+    <!-- Top Customer Navbar -->
+    <header class="cust-navbar">
+      <div class="cust-nav-inner">
+        <div class="cust-brand-wrap" onclick="customerPortal.switchTab('stock')">
+          <div class="brand-icon"><i class="fa-solid fa-droplet"></i></div>
+          <div class="brand-text">
+            <h2>e-RaktKosh</h2>
+            <span>Citizen &amp; Voluntary Donor Portal</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="cust-menu-tabs">
+          <button type="button" class="cust-tab-btn active" data-cust-tab="stock">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <span>Live Stock Finder</span>
+          </button>
+          <button type="button" class="cust-tab-btn" data-cust-tab="request">
+            <i class="fa-solid fa-hand-holding-medical"></i>
+            <span>Request Blood</span>
+          </button>
+          <button type="button" class="cust-tab-btn" data-cust-tab="donor">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>Become a Donor</span>
+          </button>
+          <button type="button" class="cust-tab-btn" data-cust-tab="camps">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Donation Camps</span>
+          </button>
+        </nav>
+
+        <!-- Right User Actions -->
+        <div class="cust-nav-actions">
+          <button type="button" class="btn btn-outline-primary btn-sm" id="btnCustSignIn" onclick="openAuthModal('donor')" style="display: none;">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In / Register
+          </button>
+
+          <div class="cust-profile-pill" id="custProfilePill">
+            <span class="cust-blood-badge" id="custBloodBadge">O+</span>
+            <div class="cust-profile-text">
+              <strong id="custUserName">Rajesh Sharma</strong>
+              <small id="custUserCity">New Delhi</small>
+            </div>
+          </div>
+
+          <button type="button" class="btn-icon-subtle text-danger" id="btnCustLogout" onclick="auth.logout()" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+
+          <button type="button" class="btn btn-light btn-sm btn-switch-admin" onclick="switchToAdminLogin()" title="Switch to Blood Bank Facility Admin">
+            <i class="fa-solid fa-shield-halved"></i> <span>Admin Portal</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="cust-main-content">
+
+      <!-- TAB 1: LIVE STOCK FINDER -->
+      <section class="cust-tab-pane active" id="custPane-stock">
+        <div class="cust-pane-header">
+          <div>
+            <h2 class="cust-pane-title">Live Blood Stock Finder</h2>
+            <p class="cust-pane-subtitle">Real-time availability across regional blood centers and transfusion reserves</p>
+          </div>
+          <div class="live-pulse-badge">
+            <span class="pulse-dot"></span> Live e-RaktKosh Feed
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="cust-filter-card">
+          <div class="cust-filter-grid">
+            <div class="form-group mb-0">
+              <label class="form-label" for="stockFilterGroup"><i class="fa-solid fa-droplet text-primary"></i> Filter by Blood Group</label>
+              <select id="stockFilterGroup" class="form-control">
+                <option value="">All Blood Groups (8 Types)</option>
+                <option value="A+">A+ (A Positive)</option>
+                <option value="A-">A- (A Negative)</option>
+                <option value="B+">B+ (B Positive)</option>
+                <option value="B-">B- (B Negative)</option>
+                <option value="AB+">AB+ (AB Positive)</option>
+                <option value="AB-">AB- (AB Negative)</option>
+                <option value="O+">O+ (O Positive)</option>
+                <option value="O-">O- (O Negative)</option>
+              </select>
+            </div>
+
+            <div class="form-group mb-0">
+              <label class="form-label" for="stockFilterCity"><i class="fa-solid fa-location-dot text-primary"></i> City / Region</label>
+              <input type="text" id="stockFilterCity" class="form-control" placeholder="e.g. New Delhi, Bengaluru...">
+            </div>
+
+            <div class="filter-actions">
+              <button type="button" class="btn btn-primary" id="btnFilterStock">
+                <i class="fa-solid fa-magnifying-glass"></i> Search Availability
+              </button>
+              <button type="button" class="btn btn-light" id="btnResetStock" title="Reset Filters">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Stock Cards Grid -->
+        <div class="cust-stock-grid" id="custStockGrid">
+          <!-- Dynamically populated by customer.js -->
+        </div>
+
+        <!-- Facility Information Banner -->
+        <div class="cust-facility-banner">
+          <div class="facility-banner-left">
+            <div class="facility-icon"><i class="fa-solid fa-hospital"></i></div>
+            <div>
+              <h3 id="custFacilityName">Central Regional Blood Centre</h3>
+              <p><i class="fa-solid fa-location-dot"></i> <span id="custFacilityCity">New Delhi</span> &bull; 24x7 Government Authorized Storage Center</p>
+            </div>
+          </div>
+          <div class="facility-banner-right">
+            <div class="facility-stat">
+              <small>Verified Stock in Vaults</small>
+              <strong id="custTotalUnits">-- Units</strong>
+            </div>
+            <div class="facility-contact">
+              <small>Facility Helpline</small>
+              <strong id="custFacilityPhone">+91 11 2345 6789</strong>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="customerPortal.switchTab('request')">
+              <i class="fa-solid fa-hand-holding-medical"></i> Request Units
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: REQUEST BLOOD & TRACKING -->
+      <section class="cust-tab-pane" id="custPane-request">
+        <div class="cust-pane-header">
+          <div>
+            <h2 class="cust-pane-title">Blood Requisition &amp; Live Tracking</h2>
+            <p class="cust-pane-subtitle">Submit hospital patient requisitions and track verification &amp; dispatch status in real time</p>
+          </div>
+          <div class="emergency-badge">
+            <i class="fa-solid fa-truck-medical"></i> Emergency Response
+          </div>
+        </div>
+
+        <div class="cust-requisition-layout">
+          <!-- Requisition Submission Form -->
+          <div class="card cust-card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon text-primary"><i class="fa-solid fa-file-waveform"></i></div>
+                <div>
+                  <h3 class="card-title">New Blood Requisition Form</h3>
+                  <span class="card-subtitle">Fill in patient and hospital details for verification</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="custRequisitionForm">
+                <div class="form-group mb-3">
+                  <label class="form-label" for="reqPatientName">Patient Full Name <span class="text-danger">*</span></label>
+                  <input type="text" id="reqPatientName" class="form-control" placeholder="e.g. Suresh Kumar" required>
+                </div>
+
+                <div class="form-group mb-3">
+                  <label class="form-label" for="reqHospitalName">Hospital / Medical Center Name <span class="text-danger">*</span></label>
+                  <input type="text" id="reqHospitalName" class="form-control" placeholder="e.g. AIIMS Trauma Centre, Room 402" required>
+                </div>
+
+                <div class="form-grid-2 mb-3">
+                  <div class="form-group">
+                    <label class="form-label" for="reqBloodGroup">Required Blood Group <span class="text-danger">*</span></label>
+                    <select id="reqBloodGroup" class="form-control" required>
+                      <option value="">Select Blood Group</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="reqUnits">Number of Units <span class="text-danger">*</span></label>
+                    <input type="number" id="reqUnits" class="form-control" value="1" min="1" max="10" required>
+                  </div>
+                </div>
+
+                <div class="form-group mb-4">
+                  <label class="form-label" for="reqContactPhone">Attendant / Contact Phone <span class="text-danger">*</span></label>
+                  <div class="input-icon-wrap">
+                    <i class="fa-solid fa-phone input-icon"></i>
+                    <input type="tel" id="reqContactPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" id="btnSubmitRequisition">
+                  <i class="fa-solid fa-paper-plane"></i> Submit Blood Requisition
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Personal Request Tracking History -->
+          <div class="card cust-card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon text-info"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div>
+                  <h3 class="card-title">My Requisition Tracking History</h3>
+                  <span class="card-subtitle">Live status updates for your submitted requisitions</span>
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-light" onclick="customerPortal.loadMyRequests()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+              </button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Req ID</th>
+                      <th>Patient &amp; Hospital</th>
+                      <th>Group</th>
+                      <th>Units</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="custTrackingTableBody">
+                    <!-- Populated by customer.js -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="empty-state" id="custTrackingEmpty" style="display: none;">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>No requisitions submitted yet. Submit a request using the form on the left.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: BECOME A DONOR & ELIGIBILITY -->
+      <section class="cust-tab-pane" id="custPane-donor">
+        <div class="cust-pane-header">
+          <div>
+            <h2 class="cust-pane-title">Become a Voluntary Blood Donor</h2>
+            <p class="cust-pane-subtitle">Self-check your medical eligibility and pledge your life-saving blood donation appointment</p>
+          </div>
+          <div class="hero-life-counter">
+            <i class="fa-solid fa-hand-holding-heart text-danger"></i> 1 Donation = Up to 3 Lives Saved
+          </div>
+        </div>
+
+        <div class="cust-donor-grid">
+          <!-- Interactive Eligibility Checker -->
+          <div class="card cust-card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon text-primary"><i class="fa-solid fa-stethoscope"></i></div>
+                <div>
+                  <h3 class="card-title">Donor Medical Eligibility Check</h3>
+                  <span class="card-subtitle">Quick 30-second self-screening before booking</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="custEligibilityForm">
+                <div class="form-grid-2 mb-3">
+                  <div class="form-group">
+                    <label class="form-label" for="checkAge">Your Age (Years)</label>
+                    <input type="number" id="checkAge" class="form-control" placeholder="e.g. 25" min="15" max="80" value="28">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="checkWeight">Body Weight (kg)</label>
+                    <input type="number" id="checkWeight" class="form-control" placeholder="e.g. 62" min="30" max="150" value="65">
+                  </div>
+                </div>
+
+                <div class="form-group mb-3">
+                  <label class="form-label" for="checkDaysSince">Days Since Last Blood Donation (0 if first time)</label>
+                  <input type="number" id="checkDaysSince" class="form-control" placeholder="e.g. 120" min="0" value="95">
+                </div>
+
+                <div class="form-group mb-4">
+                  <label class="custom-checkbox-wrap">
+                    <input type="checkbox" id="checkHealth" checked>
+                    <span class="checkbox-text">I am feeling in good health today, free from cold, flu, fever, or ongoing antibiotic treatments.</span>
+                  </label>
+                </div>
+
+                <!-- Live Eligibility Result Banner -->
+                <div class="eligibility-result-banner is-eligible" id="eligibilityResultBox">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <div>
+                    <h4>Congratulations! You are eligible to donate blood.</h4>
+                    <p>Your contribution can save up to 3 precious lives. Please choose a slot on the right to pledge your donation.</p>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Instant Donor Pledge / Appointment Form -->
+          <div class="card cust-card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon text-success"><i class="fa-solid fa-calendar-plus"></i></div>
+                <div>
+                  <h3 class="card-title">Schedule Donation Appointment</h3>
+                  <span class="card-subtitle">Book a direct slot at our Central Regional Blood Bank</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-success" id="pledgeSuccessAlert" style="display: none;"></div>
+
+              <form id="custPledgeForm">
+                <div class="form-grid-2 mb-3">
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeDonorName">Donor Full Name <span class="text-danger">*</span></label>
+                    <input type="text" id="pledgeDonorName" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeContactPhone">Contact Phone <span class="text-danger">*</span></label>
+                    <input type="tel" id="pledgeContactPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mb-3">
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeBloodGroup">Blood Group</label>
+                    <select id="pledgeBloodGroup" class="form-control">
+                      <option value="Unknown">Don't Know / First Time Donor</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeCity">City / Location</label>
+                    <input type="text" id="pledgeCity" class="form-control" placeholder="e.g. New Delhi">
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mb-4">
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeDate">Preferred Donation Date <span class="text-danger">*</span></label>
+                    <input type="date" id="pledgeDate" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pledgeSlot">Preferred Slot</label>
+                    <select id="pledgeSlot" class="form-control">
+                      <option value="Morning (09:00 AM - 12:00 PM)">Morning (09:00 AM - 12:00 PM)</option>
+                      <option value="Afternoon (12:00 PM - 03:00 PM)">Afternoon (12:00 PM - 03:00 PM)</option>
+                      <option value="Evening (03:00 PM - 06:00 PM)">Evening (03:00 PM - 06:00 PM)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" id="btnSubmitPledge">
+                  <i class="fa-solid fa-hand-holding-heart"></i> Pledge &amp; Schedule Donation
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: DONATION CAMPS -->
+      <section class="cust-tab-pane" id="custPane-camps">
+        <div class="cust-pane-header">
+          <div>
+            <h2 class="cust-pane-title">Upcoming Voluntary Donation Camps</h2>
+            <p class="cust-pane-subtitle">Join authorized community blood drives organized by Red Cross, Rotary, and State Blood Councils</p>
+          </div>
+          <div class="live-pulse-badge">
+            <i class="fa-solid fa-calendar-check"></i> Active Community Drives
+          </div>
+        </div>
+
+        <!-- Camp Search Bar -->
+        <div class="cust-filter-card mb-4">
+          <div class="cust-camps-search-bar">
+            <div class="input-icon-wrap w-100">
+              <i class="fa-solid fa-magnifying-glass input-icon"></i>
+              <input type="text" id="campSearchInput" class="form-control" placeholder="Search voluntary camps by name, organizer, venue, or city...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Camps List Grid -->
+        <div class="cust-camps-grid" id="custCampsList">
+          <!-- Populated by customer.js -->
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Application Shell -->
@@ -1408,11 +1894,73 @@
     </div>
   </div>
 
+  <!-- MODAL: CAMP RSVP / SLOT BOOKING -->
+  <div class="modal" id="modalCampRsvp">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-header-icon"><i class="fa-solid fa-calendar-check text-primary"></i></div>
+          <div>
+            <h3 class="modal-title" id="rsvpCampTitle">Book Donation Camp Slot</h3>
+            <span class="text-muted" id="rsvpCampDate">Date: -</span>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="customerPortal.closeRsvpModal()">&times;</button>
+        </div>
+        <form id="campRsvpForm">
+          <input type="hidden" id="rsvpCampId">
+          <div class="modal-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="rsvpDonorName">Donor Full Name <span class="text-danger">*</span></label>
+                <input type="text" id="rsvpDonorName" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="rsvpContactPhone">Contact Phone <span class="text-danger">*</span></label>
+                <input type="tel" id="rsvpContactPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="rsvpBloodGroup">Blood Group</label>
+                <select id="rsvpBloodGroup" class="form-control">
+                  <option value="Unknown">Don't Know / First Time</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="rsvpPreferredSlot">Preferred Time Slot</label>
+                <select id="rsvpPreferredSlot" class="form-control">
+                  <option value="Morning (09:00 AM - 12:00 PM)">Morning (09:00 AM - 12:00 PM)</option>
+                  <option value="Afternoon (12:00 PM - 03:00 PM)">Afternoon (12:00 PM - 03:00 PM)</option>
+                  <option value="Evening (03:00 PM - 05:00 PM)">Evening (03:00 PM - 05:00 PM)</option>
+                </select>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3">
+              <i class="fa-solid fa-circle-info"></i>
+              <span>Bring a valid photo ID (Aadhaar, Voter ID, or Driving License) and ensure you have eaten a light meal before donating.</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" onclick="customerPortal.closeRsvpModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnSubmitRsvp"><i class="fa-solid fa-circle-check"></i> Confirm RSVP</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATIONS CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- AUTH & CLIENT SCRIPTS -->
   <script src="auth.js"></script>
+  <script src="customer.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

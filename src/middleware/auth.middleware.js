@@ -30,11 +30,28 @@ function authenticateToken(req, res, next) {
     const decoded = jwt.verify(token, JWT_SECRET);
     
     // Check if user still exists in DB
-    const user = db.prepare(`
-      SELECT id, facilityName, licenseNumber, nodalOfficer, email, contactPhone, city, role, createdAt
-      FROM users 
-      WHERE id = ?
-    `).get(decoded.id);
+    let user = null;
+    if (decoded.role === 'admin') {
+      user = db.prepare(`
+        SELECT id, facilityName, licenseNumber, nodalOfficer, email, contactPhone, city, role, createdAt
+        FROM users 
+        WHERE id = ?
+      `).get(decoded.id);
+    } else {
+      user = db.prepare(`
+        SELECT id, fullName, email, age, gender, bloodGroup, contactPhone, city, role, createdAt
+        FROM customers
+        WHERE id = ?
+      `).get(decoded.id);
+
+      if (!user) {
+        user = db.prepare(`
+          SELECT id, facilityName, licenseNumber, nodalOfficer, email, contactPhone, city, role, createdAt
+          FROM users 
+          WHERE id = ?
+        `).get(decoded.id);
+      }
+    }
 
     if (!user) {
       return res.status(401).json({

@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node test-auth.js && node test-api.js",
+    "test": "node test-auth.js && node test-api.js && node test-customer.js",
     "test:auth": "node test-auth.js",
-    "test:api": "node test-api.js"
+    "test:api": "node test-api.js",
+    "test:customer": "node test-customer.js"
   },
   "keywords": [],
   "author": "",

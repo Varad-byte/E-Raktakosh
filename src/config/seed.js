@@ -61,10 +61,74 @@ const getInitialData = () => {
     { id: 'DON-206', donorId: 'DNR-108', donorName: 'Sunita Gill', bloodGroup: 'B-', units: 1, donationDate: getRelativeDate(-25), status: 'Under Testing' }
   ];
 
-  return { settings, inventory, donors, requests, donations };
+  const customerUser = {
+    id: 'CST-201',
+    fullName: 'Rajesh Sharma',
+    email: 'donor@eraktkosh.in',
+    age: 29,
+    gender: 'Male',
+    bloodGroup: 'O+',
+    contactPhone: '+91 98765 43210',
+    city: 'New Delhi',
+    role: 'donor'
+  };
+
+  const camps = [
+    {
+      id: 'CMP-101',
+      campName: 'Red Cross Mega Voluntary Blood Donation Camp',
+      organizer: 'Indian Red Cross Society & AIIMS',
+      venue: 'Connaught Place Central Park, Block B',
+      city: 'New Delhi',
+      campDate: getRelativeDate(3),
+      campTime: '09:00 AM - 05:00 PM',
+      contactPhone: '+91 11 2371 6441',
+      targetUnits: 150,
+      registeredCount: 42
+    },
+    {
+      id: 'CMP-102',
+      campName: 'Rotary Blood Donation Drive & Health Check',
+      organizer: 'Rotary Club of Bangalore',
+      venue: 'Kanteerava Indoor Stadium, Kasturba Rd',
+      city: 'Bengaluru',
+      campDate: getRelativeDate(6),
+      campTime: '10:00 AM - 04:30 PM',
+      contactPhone: '+91 80 2221 4500',
+      targetUnits: 120,
+      registeredCount: 35
+    },
+    {
+      id: 'CMP-103',
+      campName: 'Youth Blood Donor Fest 2026',
+      organizer: 'Lions Blood Bank & University of Mumbai',
+      venue: 'Kalina Campus Auditorium, Santacruz East',
+      city: 'Mumbai',
+      campDate: getRelativeDate(8),
+      campTime: '09:30 AM - 04:00 PM',
+      contactPhone: '+91 22 2652 6091',
+      targetUnits: 200,
+      registeredCount: 68
+    },
+    {
+      id: 'CMP-104',
+      campName: 'Apex City Hospital Voluntary Camp',
+      organizer: 'Apollo Hospital & State Blood Transfusion Council',
+      venue: 'Community Hall, Sector 15',
+      city: 'Noida',
+      campDate: getRelativeDate(12),
+      campTime: '09:00 AM - 03:00 PM',
+      contactPhone: '+91 120 400 3000',
+      targetUnits: 100,
+      registeredCount: 19
+    }
+  ];
+
+  return { settings, inventory, donors, requests, donations, customerUser, camps };
 };
 
 module.exports = {
   getInitialData,
   getRelativeDate
 };
+
