@@ -43,6 +43,25 @@ const customerPortal = {
       });
     }
 
+    const cityFilterInput = document.getElementById('stockFilterCity');
+    if (cityFilterInput) {
+      cityFilterInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const bg = document.getElementById('stockFilterGroup')?.value;
+          this.loadLiveStock(bg, cityFilterInput.value);
+        }
+      });
+    }
+
+    const groupFilterSelect = document.getElementById('stockFilterGroup');
+    if (groupFilterSelect) {
+      groupFilterSelect.addEventListener('change', () => {
+        const city = document.getElementById('stockFilterCity')?.value;
+        this.loadLiveStock(groupFilterSelect.value, city);
+      });
+    }
+
     const resetStockBtn = document.getElementById('btnResetStock');
     if (resetStockBtn) {
       resetStockBtn.addEventListener('click', () => {
