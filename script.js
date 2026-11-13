@@ -39,8 +39,10 @@
    ============================================================================== */
 
 const API_CONFIG = {
-  // Proposed Base URL for the backend API
-  BASE_URL: 'http://localhost:5000/api',
+  // Base URL for the backend API
+  BASE_URL: (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:'))
+    ? `${window.location.origin}/api` 
+    : 'http://localhost:5000/api',
 
   // Proposed placeholder endpoints (Confirm with backend team)
   ENDPOINTS: {

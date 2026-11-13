@@ -7,7 +7,7 @@
 const AUTH_CONFIG = {
   TOKEN_KEY: 'bbims_auth_token',
   USER_KEY: 'bbims_auth_user',
-  BASE_URL: window.location.origin.includes('5000') 
+  BASE_URL: (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:'))
     ? `${window.location.origin}/api` 
     : 'http://localhost:5000/api'
 };
